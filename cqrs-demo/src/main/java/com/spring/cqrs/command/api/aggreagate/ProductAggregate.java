@@ -76,4 +76,10 @@ public class ProductAggregate {
         this.price = productUpdateEvent.getPrice();
     }
 
+
+    @EventSourcingHandler
+    public void updateStateByDeleting(ProductDeleteEvent productDeleteEvent){
+        this.productId = productDeleteEvent.getProductId();
+    }
+
 }
