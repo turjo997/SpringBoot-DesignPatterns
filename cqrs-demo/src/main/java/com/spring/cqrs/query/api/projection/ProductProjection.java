@@ -3,6 +3,7 @@ package com.spring.cqrs.query.api.projection;
 import com.spring.cqrs.command.api.data.Product;
 import com.spring.cqrs.command.api.repository.ProductRepository;
 import com.spring.cqrs.query.api.model.ProductResponseModel;
+import com.spring.cqrs.query.api.queries.GetProductByNameQuery;
 import com.spring.cqrs.query.api.queries.GetProductsQuery;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,7 @@ public class ProductProjection {
 
 
     @QueryHandler
-    public List<ProductResponseModel> handle(GetProductsQuery getProductsQuery) {
+    public List<ProductResponseModel> handleGetAllProducts(GetProductsQuery getProductsQuery) {
         List<Product> products =
                 productRepository.findAll();
 
@@ -38,5 +39,22 @@ public class ProductProjection {
 
         return productResponseModels;
     }
+
+
+    @QueryHandler
+    public List<ProductResponseModel> handleGetProductByName(GetProductByNameQuery query) {
+
+        List<Product> products = productRepository.findByName(query.getName());
+
+        return products.stream()
+                .map(product -> ProductResponseModel.builder()
+                        .quantity(product.getQuantity())
+                        .price(product.getPrice())
+                        .name(product.getName())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+
 
 }

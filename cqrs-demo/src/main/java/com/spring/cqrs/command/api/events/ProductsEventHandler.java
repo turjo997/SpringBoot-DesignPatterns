@@ -8,6 +8,8 @@ import org.axonframework.messaging.interceptors.ExceptionHandler;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @ProcessingGroup("product")
 public class ProductsEventHandler {
@@ -19,7 +21,7 @@ public class ProductsEventHandler {
     }
 
     @EventHandler
-    public void on(ProductCreatedEvent event) throws Exception {
+    public void addProductEvent(ProductCreatedEvent event)  {
 
         Product product = new Product();
 
@@ -27,7 +29,35 @@ public class ProductsEventHandler {
 
         productRepository.save(product);
 
-        throw new Exception("Exception Occurred");
+        //throw new Exception("Exception Occurred");
+    }
+
+
+    @EventHandler
+    public void updateProductEvent(ProductUpdateEvent productUpdateEvent) throws Exception {
+      //  System.out.println("ekhane asche");
+       // System.out.println(productUpdateEvent.getProductId());
+
+        Optional<Product> optionalProduct = productRepository.findById
+                (
+                        productUpdateEvent.getProductId()
+                );
+
+        if(optionalProduct.isPresent()){
+
+            Product product = optionalProduct.get();
+
+            BeanUtils.copyProperties(productUpdateEvent , product);
+
+            productRepository.save(product);
+        }else{
+            throw new Exception("Product not found");
+        }
+    }
+
+    @EventHandler
+    public void deleteProductEvent(ProductDeleteEvent productDeleteEvent){
+         productRepository.deleteById(productDeleteEvent.getProductId());
     }
 
 
