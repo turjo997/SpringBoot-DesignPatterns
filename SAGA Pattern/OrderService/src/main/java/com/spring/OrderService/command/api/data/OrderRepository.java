@@ -1,4 +1,6 @@
 package com.spring.OrderService.command.api.data;
 
-public class OrderRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface OrderRepository extends JpaRepository<Order, String> {
 }
